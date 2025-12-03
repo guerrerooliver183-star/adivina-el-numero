@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adivina el Número / Guess the Number</title>
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -11,9 +12,7 @@
         padding: 50px;
         background-color: #f0f8ff;
     }
-    h1 {
-        color: #333;
-    }
+    h1 { color: #333; }
     select, input, button {
         padding: 10px;
         font-size: 16px;
@@ -26,21 +25,32 @@
         border: none;
         border-radius: 5px;
     }
-    button:hover {
-        background-color: #45a049;
-    }
+    button:hover { background-color: #45a049; }
     #resultado {
         font-size: 20px;
         margin-top: 20px;
         color: #333;
     }
+    #alerta {
+        font-size: 20px;
+        margin-top: 10px;
+        color: red;
+        font-weight: bold;
+    }
+    #acertados {
+        font-size: 20px;
+        margin-top: 10px;
+        color: green;
+        font-weight: bold;
+    }
     footer {
-        margin-top: 50px;
+        margin-top: 40px;
         font-size: 14px;
         color: #555;
     }
 </style>
 </head>
+
 <body>
     <h1 id="titulo">¡Adivina el número!</h1>
     <p id="instrucciones">El sistema piensa un número del 1 al 100. ¿Puedes adivinarlo?</p>
@@ -54,104 +64,124 @@
     <button id="adivinarBtn">Adivinar</button>
 
     <p id="resultado"></p>
+    <p id="alerta"></p>
     <p id="intentos">Intentos: 0</p>
+    <p id="acertados">Números acertados: 0</p>
 
     <footer id="footer">
-        © 2025 Oliver Guerrero & ChatGPT. Todos los derechos reservados.
+        © Todos los derechos reservados 2025 — Oliver Guerrero & ChatGPT
     </footer>
 
-    <script>
-        // Número secreto y contador
-        let numeroSecreto = Math.floor(Math.random() * 100) + 1;
-        let intentos = 0;
-        let contadorInterval;
+<script>
+    let numeroSecreto = Math.floor(Math.random() * 100) + 1;
+    let intentos = 0;
+    let acertados = 0;
+    let contadorInterval;
 
-        // Elementos del DOM
-        const idiomaSelect = document.getElementById('idioma');
-        const titulo = document.getElementById('titulo');
-        const instrucciones = document.getElementById('instrucciones');
-        const btn = document.getElementById('adivinarBtn');
-        const input = document.getElementById('numero');
-        const resultado = document.getElementById('resultado');
-        const intentosTexto = document.getElementById('intentos');
-        const footer = document.getElementById('footer');
+    const idiomaSelect = document.getElementById('idioma');
+    const titulo = document.getElementById('titulo');
+    const instrucciones = document.getElementById('instrucciones');
+    const btn = document.getElementById('adivinarBtn');
+    const input = document.getElementById('numero');
+    const resultado = document.getElementById('resultado');
+    const alerta = document.getElementById('alerta');
+    const intentosTexto = document.getElementById('intentos');
+    const acertadosTexto = document.getElementById('acertados');
+    const footer = document.getElementById('footer');
 
-        // Mensajes para el juego
-        let mensajes = {
-            es: {
-                titulo: "¡Adivina el número!",
-                instrucciones: "El sistema piensa un número del 1 al 100. ¿Puedes adivinarlo?",
-                adivinar: "Adivinar",
-                correcto: "¡Correcto! 🎉",
-                bajo: "Demasiado bajo ⬇️",
-                alto: "Demasiado alto ⬆️",
-                generando: "Generando número nuevo en"
-            },
-            en: {
-                titulo: "Guess the Number!",
-                instrucciones: "The system thinks of a number from 1 to 100. Can you guess it?",
-                adivinar: "Guess",
-                correcto: "Correct! 🎉",
-                bajo: "Too low ⬇️",
-                alto: "Too high ⬆️",
-                generando: "Generating new number in"
-            }
-        };
+    let mensajes = {
+        es: {
+            titulo: "¡Adivina el número!",
+            instrucciones: "El sistema piensa un número del 1 al 100. ¿Puedes adivinarlo?",
+            adivinar: "Adivinar",
+            correcto: "¡Correcto! 🎉",
+            bajo: "Demasiado bajo ⬇️",
+            alto: "Demasiado alto ⬆️",
+            generando: "Generando número nuevo en",
+            limite: "⚠ El número debe estar entre 1 y 100",
+            intentos: "Intentos",
+            acertados: "Números acertados",
+            footer: "© Todos los derechos reservados 2025 — Oliver Guerrero & ChatGPT"
+        },
+        en: {
+            titulo: "Guess the Number!",
+            instrucciones: "The system thinks of a number from 1 to 100. Can you guess it?",
+            adivinar: "Guess",
+            correcto: "Correct! 🎉",
+            bajo: "Too low ⬇️",
+            alto: "Too high ⬆️",
+            generando: "Generating new number in",
+            limite: "⚠ Number must be between 1 and 100",
+            intentos: "Attempts",
+            acertados: "Numbers guessed correctly",
+            footer: "© All Rights Reserved 2025 — Oliver Guerrero & ChatGPT"
+        }
+    };
 
-        // Mensajes para el footer
-        let mensajesFooter = {
-            es: "© 2025 Oliver Guerrero & ChatGPT. Todos los derechos reservados.",
-            en: "© 2025 Oliver Guerrero & ChatGPT. All Rights Reserved."
-        };
+    function actualizarIdioma() {
+        const lang = idiomaSelect.value;
 
-        // Función para actualizar idioma del juego
-        function actualizarIdioma() {
-            const lang = idiomaSelect.value;
-            titulo.textContent = mensajes[lang].titulo;
-            instrucciones.textContent = mensajes[lang].instrucciones;
-            btn.textContent = mensajes[lang].adivinar;
-            footer.textContent = mensajesFooter[lang];
-            intentosTexto.textContent = lang === 'es' ? `Intentos: ${intentos}` : `Attempts: ${intentos}`;
+        titulo.textContent = mensajes[lang].titulo;
+        instrucciones.textContent = mensajes[lang].instrucciones;
+        btn.textContent = mensajes[lang].adivinar;
+
+        intentosTexto.textContent = `${mensajes[lang].intentos}: ${intentos}`;
+        acertadosTexto.textContent = `${mensajes[lang].acertados}: ${acertados}`;
+
+        footer.textContent = mensajes[lang].footer;
+    }
+
+    idiomaSelect.addEventListener("change", actualizarIdioma);
+    actualizarIdioma();
+
+    btn.addEventListener("click", () => {
+        const guess = Number(input.value);
+        const lang = idiomaSelect.value;
+
+        // ⚠ Nueva condición: fuera del 1–100
+        if (guess < 1 || guess > 100 || !guess) {
+            alerta.textContent = mensajes[lang].limite;
+            resultado.textContent = "";
+            return;
         }
 
-        idiomaSelect.addEventListener('change', actualizarIdioma);
-        actualizarIdioma(); // Inicializa al cargar la página
+        alerta.textContent = ""; // limpiar mensaje rojo
 
-        // Evento del botón Adivinar
-        btn.addEventListener('click', () => {
-            const guess = Number(input.value);
-            intentos++;
+        intentos++;
+        intentosTexto.textContent = `${mensajes[lang].intentos}: ${intentos}`;
 
-            const lang = idiomaSelect.value;
+        if (guess === numeroSecreto) {
+            acertados++;
+            acertadosTexto.textContent = `${mensajes[lang].acertados}: ${acertados}`;
 
-            if (guess === numeroSecreto) {
-                resultado.textContent = mensajes[lang].correcto;
+            resultado.textContent = mensajes[lang].correcto;
 
-                if (contadorInterval) clearInterval(contadorInterval);
+            let tiempo = 5;
+            if (contadorInterval) clearInterval(contadorInterval);
 
-                let tiempo = 5;
-                contadorInterval = setInterval(() => {
-                    resultado.textContent = `${mensajes[lang].generando} ${tiempo}...`;
-                    tiempo--;
-                    if (tiempo < 0) {
-                        clearInterval(contadorInterval);
-                        numeroSecreto = Math.floor(Math.random() * 100) + 1;
-                        resultado.textContent = '';
-                        intentos = 0;
-                        intentosTexto.textContent = lang === 'es' ? `Intentos: ${intentos}` : `Attempts: ${intentos}`;
-                    }
-                }, 1000);
+            contadorInterval = setInterval(() => {
+                resultado.textContent = `${mensajes[lang].generando} ${tiempo}...`;
+                tiempo--;
 
-            } else if (guess < numeroSecreto) {
-                resultado.textContent = mensajes[lang].bajo;
-            } else {
-                resultado.textContent = mensajes[lang].alto;
-            }
+                if (tiempo < 0) {
+                    clearInterval(contadorInterval);
+                    numeroSecreto = Math.floor(Math.random() * 100) + 1;
+                    resultado.textContent = "";
+                    intentos = 0;
+                    intentosTexto.textContent = `${mensajes[lang].intentos}: ${intentos}`;
+                }
+            }, 1000);
+        } 
+        else if (guess < numeroSecreto) {
+            resultado.textContent = mensajes[lang].bajo;
+        } 
+        else {
+            resultado.textContent = mensajes[lang].alto;
+        }
 
-            intentosTexto.textContent = lang === 'es' ? `Intentos: ${intentos}` : `Attempts: ${intentos}`;
-            input.value = '';
-            input.focus();
-        });
-    </script>
+        input.value = "";
+        input.focus();
+    });
+</script>
 </body>
 </html>
