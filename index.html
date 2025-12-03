@@ -56,15 +56,17 @@
     <p id="resultado"></p>
     <p id="intentos">Intentos: 0</p>
 
-    <footer>
-        © All Rights Reserved 2025 Oliver Guerrero & ChatGPT
+    <footer id="footer">
+        © 2025 Oliver Guerrero & ChatGPT. Todos los derechos reservados.
     </footer>
 
     <script>
+        // Número secreto y contador
         let numeroSecreto = Math.floor(Math.random() * 100) + 1;
         let intentos = 0;
         let contadorInterval;
 
+        // Elementos del DOM
         const idiomaSelect = document.getElementById('idioma');
         const titulo = document.getElementById('titulo');
         const instrucciones = document.getElementById('instrucciones');
@@ -72,7 +74,9 @@
         const input = document.getElementById('numero');
         const resultado = document.getElementById('resultado');
         const intentosTexto = document.getElementById('intentos');
+        const footer = document.getElementById('footer');
 
+        // Mensajes para el juego
         let mensajes = {
             es: {
                 titulo: "¡Adivina el número!",
@@ -94,16 +98,26 @@
             }
         };
 
+        // Mensajes para el footer
+        let mensajesFooter = {
+            es: "© 2025 Oliver Guerrero & ChatGPT. Todos los derechos reservados.",
+            en: "© 2025 Oliver Guerrero & ChatGPT. All Rights Reserved."
+        };
+
+        // Función para actualizar idioma del juego
         function actualizarIdioma() {
             const lang = idiomaSelect.value;
             titulo.textContent = mensajes[lang].titulo;
             instrucciones.textContent = mensajes[lang].instrucciones;
             btn.textContent = mensajes[lang].adivinar;
+            footer.textContent = mensajesFooter[lang];
+            intentosTexto.textContent = lang === 'es' ? `Intentos: ${intentos}` : `Attempts: ${intentos}`;
         }
 
         idiomaSelect.addEventListener('change', actualizarIdioma);
-        actualizarIdioma(); // Inicializa
+        actualizarIdioma(); // Inicializa al cargar la página
 
+        // Evento del botón Adivinar
         btn.addEventListener('click', () => {
             const guess = Number(input.value);
             intentos++;
@@ -124,7 +138,7 @@
                         numeroSecreto = Math.floor(Math.random() * 100) + 1;
                         resultado.textContent = '';
                         intentos = 0;
-                        intentosTexto.textContent = idiomaSelect.value === 'es' ? `Intentos: ${intentos}` : `Attempts: ${intentos}`;
+                        intentosTexto.textContent = lang === 'es' ? `Intentos: ${intentos}` : `Attempts: ${intentos}`;
                     }
                 }, 1000);
 
@@ -134,7 +148,7 @@
                 resultado.textContent = mensajes[lang].alto;
             }
 
-            intentosTexto.textContent = idiomaSelect.value === 'es' ? `Intentos: ${intentos}` : `Attempts: ${intentos}`;
+            intentosTexto.textContent = lang === 'es' ? `Intentos: ${intentos}` : `Attempts: ${intentos}`;
             input.value = '';
             input.focus();
         });
