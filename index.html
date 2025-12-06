@@ -6,47 +6,84 @@
 <title>Adivina el Número / Guess the Number</title>
 
 <style>
+    :root {
+        --bg: #f0f8ff;
+        --text: #333;
+        --card: white;
+        --button-bg: #4CAF50;
+        --button-hover: #45a049;
+        --alert: red;
+        --success: green;
+    }
+
+    /* 🌙 Modo oscuro automático */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg: #0d1117;
+            --text: #e6edf3;
+            --card: #161b22;
+            --button-bg: #238636;
+            --button-hover: #2ea043;
+            --alert: #ff7070;
+            --success: #4dff8a;
+        }
+    }
+
     body {
         font-family: Arial, sans-serif;
         text-align: center;
         padding: 50px;
-        background-color: #f0f8ff;
+        background-color: var(--bg);
+        color: var(--text);
     }
-    h1 { color: #333; }
+
+    h1 { color: var(--text); }
+
     select, input, button {
         padding: 10px;
         font-size: 16px;
         margin: 10px;
-    }
-    button {
-        cursor: pointer;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
+        background-color: var(--card);
+        color: var(--text);
+        border: 1px solid #aaa;
         border-radius: 5px;
     }
-    button:hover { background-color: #45a049; }
+
+    button {
+        cursor: pointer;
+        background-color: var(--button-bg);
+        color: white !important;
+        border: none;
+    }
+
+    button:hover {
+        background-color: var(--button-hover);
+    }
+
     #resultado {
         font-size: 20px;
         margin-top: 20px;
-        color: #333;
+        color: var(--text);
     }
+
     #alerta {
         font-size: 20px;
         margin-top: 10px;
-        color: red;
+        color: var(--alert);
         font-weight: bold;
     }
+
     #acertados {
         font-size: 20px;
         margin-top: 10px;
-        color: green;
+        color: var(--success);
         font-weight: bold;
     }
+
     footer {
         margin-top: 40px;
         font-size: 14px;
-        color: #555;
+        color: var(--text);
     }
 </style>
 </head>
@@ -138,14 +175,13 @@
         const guess = Number(input.value);
         const lang = idiomaSelect.value;
 
-        // ⚠ Nueva condición: fuera del 1–100
         if (guess < 1 || guess > 100 || !guess) {
             alerta.textContent = mensajes[lang].limite;
             resultado.textContent = "";
             return;
         }
 
-        alerta.textContent = ""; // limpiar mensaje rojo
+        alerta.textContent = "";
 
         intentos++;
         intentosTexto.textContent = `${mensajes[lang].intentos}: ${intentos}`;
